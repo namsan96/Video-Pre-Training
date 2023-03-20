@@ -3,9 +3,9 @@ import functools
 import torch as th
 from torch import nn
 
-import lib.xf as xf
-from lib.minecraft_util import store_args
-from lib.tree_util import tree_map
+from . import xf as xf
+from .minecraft_util import store_args
+from .tree_util import tree_map
 
 
 @functools.lru_cache()
@@ -73,7 +73,7 @@ def get_mask(first_b11: th.Tensor, state_mask: th.Tensor, t: int, T: int, maxlen
     b = first_b11.shape[0]
 
     if state_mask is None:
-        state_mask = th.zeros((b, 1, T - t), dtype=bool, device=device)
+        state_mask = th.zeros((b, t, T - t), dtype=bool, device=device)
 
     m_btT = get_band_diagonal_mask(t, T, maxlen, b, device).clone()  # Should be shape B, t, T
     not_first = ~first_b11.to(device=device)
@@ -86,7 +86,7 @@ def get_mask(first_b11: th.Tensor, state_mask: th.Tensor, t: int, T: int, maxlen
     state_mask = th.cat(
         [
             state_mask[:, :, t:] & not_first,
-            th.ones((b, 1, min(t, T - t)), dtype=bool, device=device),
+            th.ones((b, t, min(t, T - t)), dtype=bool, device=device),
         ],
         dim=-1,
     )

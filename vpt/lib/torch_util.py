@@ -16,8 +16,8 @@ import torch.distributions as dis
 import torch.nn.functional as F
 from torch import nn
 
-import lib.tree_util as tree_util
-from lib import misc
+from . import tree_util as tree_util
+from . import misc
 
 
 def contextmanager_to_decorator(cm):

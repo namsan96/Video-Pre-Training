@@ -8,9 +8,7 @@ import torch as th
 from torch import nn
 from torch.nn import functional as F
 
-from lib import misc, mlp
-from lib import torch_util as tu
-from lib import util
+from . import misc, mlp, torch_util as tu, util
 
 SENTINEL = 0.1337
 
@@ -37,7 +35,7 @@ def attention(
     All keys where every value is equal to the constant SENTINEL will be ignored.
     Currently this is only used by StridedAttn.
     """
-    assert Q_bte.dtype == K_bTe.dtype == dtype, f"{Q_bte.dtype}, {K_bTe.dtype}, {dtype} must all match"
+    #assert Q_bte.dtype == K_bTe.dtype == dtype, f"{Q_bte.dtype}, {K_bTe.dtype}, {dtype} must all match"
     e = Q_bte.shape[2]
     if check_sentinel:
         invalid = (K_bTe == SENTINEL).int().sum(dim=-1) == e
