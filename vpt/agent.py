@@ -104,8 +104,9 @@ def resize_image(img, target_resolution):
 
 
 class MineRLAgent:
-    def __init__(self, env, device=None, policy_kwargs=None, pi_head_kwargs=None):
-        validate_env(env)
+    def __init__(self, device=None, policy_kwargs=None, pi_head_kwargs=None):
+    #def __init__(self, env, device=None, policy_kwargs=None, pi_head_kwargs=None):
+        #validate_env(env)
 
         if device is None:
             device = default_device_type()
