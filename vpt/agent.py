@@ -127,6 +127,7 @@ class MineRLAgent:
         agent_kwargs = dict(policy_kwargs=policy_kwargs, pi_head_kwargs=pi_head_kwargs, action_space=action_space)
 
         self.policy = MinecraftAgentPolicy(**agent_kwargs).to(device)
+        self.policy.net.device = device
         self.hidden_state = self.policy.initial_state(1)
         self._dummy_first = th.from_numpy(np.array((False,))).to(device)
 

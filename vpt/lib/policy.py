@@ -219,7 +219,14 @@ class MinecraftPolicy(nn.Module):
 
     def initial_state(self, batchsize):
         if self.recurrent_layer:
-            return self.recurrent_layer.initial_state(batchsize)
+            state = self.recurrent_layer.initial_state(batchsize)
+            return [
+                (
+                    mask.to(self.device) if mask is not None else None,
+                    (k.to(self.device), v.to(self.device))
+                )
+                for mask, (k, v) in state
+            ]
         else:
             return None
 
