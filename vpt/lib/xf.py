@@ -329,7 +329,7 @@ class SelfAttentionLayer(AttentionLayerBase):
         self.log_scope = log_scope
         self.use_muP_factor = use_muP_factor
 
-    def residual(self, X_bte, state):
+    def residual(self, X_bte, state, mask):
         X_bte = self.ln_x(X_bte)
         Q_bte = self.q_layer(X_bte)
         K_bte = self.k_layer(X_bte)
@@ -342,7 +342,7 @@ class SelfAttentionLayer(AttentionLayerBase):
             Q_bte,
             K_bte,
             V_bte,
-            mask=self.attn.mask,
+            mask=mask,
             extra_btT=extra_btT,
             maxlen=self.maxlen,
             dtype=self.dtype,
@@ -353,8 +353,8 @@ class SelfAttentionLayer(AttentionLayerBase):
         Aproj_bte = self.proj_layer(A_bte)
         return Aproj_bte, state
 
-    def forward(self, X_bte, state):
-        R_bte, state = self.residual(X_bte, state)
+    def forward(self, X_bte, state, mask):
+        R_bte, state = self.residual(X_bte, state, mask)
         return X_bte + R_bte, state
 
     def stateless_forward(self, X_bte):
