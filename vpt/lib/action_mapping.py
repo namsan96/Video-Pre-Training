@@ -180,6 +180,8 @@ class CameraHierarchicalMapping(ActionMapping):
         """Converts a factored action (ac) to the new space. Assumes ac has a batch dim"""
         assert ac["camera"].ndim == 2, f"bad camera label, {ac['camera']}"
         assert ac["buttons"].ndim == 2, f"bad buttons label, {ac['buttons']}"
+        print("in from_factored")
+
         # Get button choices for everything but camera
         choices_by_group = OrderedDict(
             (k, self.factored_buttons_to_groups(ac["buttons"], v)) for k, v in self.BUTTONS_GROUPS.items() if k != "camera"
@@ -195,6 +197,7 @@ class CameraHierarchicalMapping(ActionMapping):
             key = tuple([v[i] for v in choices_by_group.values()])
             if ac["buttons"][i, Buttons.ALL.index("inventory")] == 1:
                 key = "inventory"
+                print("inventory has activated!")
             new_button_ac.append(self.BUTTONS_COMBINATION_TO_IDX[key])
 
             # Camera -- inventory is also exclusive with camera
@@ -207,6 +210,7 @@ class CameraHierarchicalMapping(ActionMapping):
                 key = (f"camera_x{ac['camera'][i][0]}", f"camera_y{ac['camera'][i][1]}")
             new_camera_ac.append(self.camera_combination_to_idx[key])
 
+        print("out from_factored")
         return dict(
             buttons=np.array(new_button_ac)[:, None],
             camera=np.array(new_camera_ac)[:, None],
@@ -228,6 +232,7 @@ class CameraHierarchicalMapping(ActionMapping):
         return {
             "camera": TensorType(shape=(1,), eltype=Discrete(len(self.camera_combinations))),
             "buttons": TensorType(shape=(1,), eltype=Discrete(len(self.BUTTONS_COMBINATIONS))),
+            "craft_items": TensorType(shape=(1,), eltype=Discrete(244)),
         }
 
     def get_zero_action(self):
