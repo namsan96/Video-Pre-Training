@@ -161,6 +161,7 @@ class ActionTransformer:
         out = {name: acs["buttons"][..., i] for (i, name) in enumerate(Buttons.ALL)}
 
         out["camera"] = self.undiscretize_camera(acs["camera"])
+        # out["craft_items"] = acs["craft_items"]
 
         return out
 

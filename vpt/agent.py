@@ -159,7 +159,8 @@ class MineRLAgent:
         if isinstance(action["buttons"], th.Tensor):
             action = {
                 "buttons": agent_action["buttons"].cpu().numpy(),
-                "camera": agent_action["camera"].cpu().numpy()
+                "camera": agent_action["camera"].cpu().numpy(),
+                "craft_items": agent_action["craft_items"].cpu().numpy(),
             }
         minerl_action = self.action_mapper.to_factored(action)
         minerl_action_transformed = self.action_transformer.policy2env(minerl_action)

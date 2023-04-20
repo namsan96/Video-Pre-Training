@@ -180,7 +180,6 @@ class CameraHierarchicalMapping(ActionMapping):
         """Converts a factored action (ac) to the new space. Assumes ac has a batch dim"""
         assert ac["camera"].ndim == 2, f"bad camera label, {ac['camera']}"
         assert ac["buttons"].ndim == 2, f"bad buttons label, {ac['buttons']}"
-        print("in from_factored")
 
         # Get button choices for everything but camera
         choices_by_group = OrderedDict(
@@ -210,7 +209,6 @@ class CameraHierarchicalMapping(ActionMapping):
                 key = (f"camera_x{ac['camera'][i][0]}", f"camera_y{ac['camera'][i][1]}")
             new_camera_ac.append(self.camera_combination_to_idx[key])
 
-        print("out from_factored")
         return dict(
             buttons=np.array(new_button_ac)[:, None],
             camera=np.array(new_camera_ac)[:, None],
@@ -220,13 +218,14 @@ class CameraHierarchicalMapping(ActionMapping):
         """Converts an action in the new space (ac) to the factored action space. Assumes ac has a batch dim"""
         assert ac["camera"].shape[-1] == 1
         assert ac["buttons"].shape[-1] == 1
-
         new_button_ac = self.BUTTON_IDX_TO_FACTORED[np.squeeze(ac["buttons"], -1)]
         camera_off = self.BUTTON_IDX_TO_CAMERA_META_OFF[np.squeeze(ac["buttons"], -1)]
         new_camera_ac = self.CAMERA_IDX_TO_FACTORED[np.squeeze(ac["camera"], -1)]
         new_camera_ac[camera_off] = self.camera_null_bin
 
-        return dict(buttons=new_button_ac, camera=new_camera_ac)
+        return dict(buttons=new_button_ac, 
+                    camera=new_camera_ac,
+                    craft_items=ac["craft_items"])
 
     def get_action_space_update(self):
         return {
