@@ -223,9 +223,11 @@ class CameraHierarchicalMapping(ActionMapping):
         new_camera_ac = self.CAMERA_IDX_TO_FACTORED[np.squeeze(ac["camera"], -1)]
         new_camera_ac[camera_off] = self.camera_null_bin
 
-        return dict(buttons=new_button_ac, 
-                    camera=new_camera_ac,
-                    craft_items=ac["craft_items"])
+        return {
+            'buttons': new_button_ac,
+            'camera': new_camera_ac,
+            **{k: v for k, v in ac.items() if k not in ['buttons', 'camera']}
+        }
 
     def get_action_space_update(self):
         return {

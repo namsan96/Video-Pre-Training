@@ -245,6 +245,10 @@ class MinecraftAgentPolicy(nn.Module):
         return ScaledMSEHead(v_out_size, 1, norm_type=norm_type, norm_kwargs=norm_kwargs)
 
     def make_action_head(self, pi_out_size: int, **pi_head_opts):
+        if 'use_as_craft_smelt' in pi_head_opts:
+            self.action_space.separated_craft_smelt = pi_head_opts.pop('use_as_craft_smelt')
+        else:
+            self.action_space.separated_craft_smelt = False
         return make_action_head(self.action_space, pi_out_size, **pi_head_opts)
 
     def initial_state(self, batch_size: int):

@@ -259,6 +259,24 @@ class DictActionHead(nn.ModuleDict):
     def kl_divergence(self, logits_q: torch.Tensor, logits_p: torch.Tensor) -> torch.Tensor:
         return sum(subhead.kl_divergence(logits_q[k], logits_p[k]) for k, subhead in self.items())
 
+    
+class CraftSmeltActionHead(DictActionHead):
+    def forward(self, input_data: torch.Tensor, **kwargs) -> Any:
+        result = {}
+        for head_name, subhead in self.items():
+            if head_name != 'craft_items':
+                head_kwargs = {
+                    kwarg_name: kwarg[head_name]
+                    for kwarg_name, kwarg in kwargs.items()
+                    if kwarg is not None and head_name in kwarg
+                }
+                result[head_name] = subhead(input_data, **head_kwargs)
+            else:
+                craft_item = subhead(input_data)
+                result['hand_craft_item'] = craft_item
+                result['hand_table_craft_item'] = craft_item
+                result['smelt_item'] = craft_item
+        return result
 
 def make_action_head(ac_space: ValType, pi_out_size: int, temperature: float = 1.0):
     """Helper function to create an action head corresponding to the environment action space"""
@@ -271,5 +289,8 @@ def make_action_head(ac_space: ValType, pi_out_size: int, temperature: float = 1
             assert len(ac_space.shape) == 1, "Nontrivial shapes not yet implemented."
             return DiagGaussianActionHead(pi_out_size, ac_space.shape[0])
     elif isinstance(ac_space, DictType):
-        return DictActionHead({k: make_action_head(v, pi_out_size, temperature) for k, v in ac_space.items()})
+        if ac_space.separated_craft_smelt == False:
+            return DictActionHead({k: make_action_head(v, pi_out_size, temperature) for k, v in ac_space.items()})
+        else:
+            return CraftSmeltActionHead({k: make_action_head(v, pi_out_size, temperature) for k, v in ac_space.items()})
     raise NotImplementedError(f"Action space of type {type(ac_space)} is not supported")
